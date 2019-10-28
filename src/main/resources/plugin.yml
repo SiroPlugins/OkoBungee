@@ -1,0 +1,14 @@
+name: OkoBungee
+main: com.github.siroshun09.okobungee.OkoBungee
+version: ${project.version}
+api-version: "1.14"
+description: ${project.description}
+author: Siroshun09
+commands:
+  okobungee:
+    aliases: [ob]
+    description: "OkoBungee の管理用コマンド"
+permissions:
+  okobungee.reload:
+    description: "config.yml の再読み込みコマンドの実行権限"
+    default: op

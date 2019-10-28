@@ -1,0 +1,25 @@
+# kick 後に移動するサーバーの名前
+BungeeKick:
+  sendTo: "hub"
+  message: "&c* &b%from%&7 から kick されました: &f"
+
+# /<server> でそのサーバーに移動できるコマンドのメッセージ設定
+SlashServer:
+  messages:
+    onlyPlayer: "* このコマンドはプレイヤーのみ実行できます。"
+    alreadyConnected: "&7* &cすでに接続しています。"
+    moving: "&7* サーバー &b%server%&7 へ移動します。"
+
+# サーバー移動時のメッセージ設定
+ServerSwitchMsg: "&7* &b%player%&7 が &b%server%&7 へ移動しました。"
+
+# サーバー接続時のメッセージ設定
+ServerConnectMsg: "&6* &r%player%&6 がおこ鯖にログインしました。"
+
+# サーバー切断時のメッセージ設定
+ServerDisconnectMsg: "&7* &r%player%&7 がおこ鯖からログアウトしました。"
+
+# 時報の設定
+ZihouMessage: "&8[&9時報&8] &7%h時%m分%s秒になりました。"
+
+
