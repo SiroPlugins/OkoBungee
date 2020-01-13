@@ -1,0 +1,48 @@
+name: Java CI
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up JDK 10
+        uses: actions/setup-java@v1
+        with:
+          java-version: 10
+      - uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Build with Maven
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p ~/.m2
+          echo "<settings><servers><server><id>github</id><username>Siroshun09</username><password>${GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
+          mvn -B package --file pom.xml
+      - name: Compress generated file
+        id: compress_generated_files
+        run: zip -r OkoBungee target/
+      - name: Send generated files to Discord (S)
+        uses: sinshutu/upload-to-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.WEBHOOK_S }}
+        with:
+          args: OkoBungee.zip
+      - name: Discord notification (O)
+        if: github.ref == 'refs/heads/master'
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.WEBHOOK_O }}
+        with:
+          args: ':new: OkoBungee が更新されました: https://github.com/SiroPlugins/OkoBungee'
+      - name: Send generated files to Discord (O)
+        uses: sinshutu/upload-to-discord@master
+        if: github.ref == 'refs/heads/master'
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.WEBHOOK_O }}
+        with:
+          args: OkoBungee.zip

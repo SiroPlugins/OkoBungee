@@ -1,7 +1,7 @@
 # kick 後に移動するサーバーの名前
 BungeeKick:
   sendTo: "hub"
-  message: "&c* &b%from%&7 から kick されました: &f"
+  message: "&c* &b%from%&7 から kick されました: &f%reason%"
 
 # /<server> でそのサーバーに移動できるコマンドのメッセージ設定
 SlashServer:
@@ -9,6 +9,7 @@ SlashServer:
     onlyPlayer: "* このコマンドはプレイヤーのみ実行できます。"
     alreadyConnected: "&7* &cすでに接続しています。"
     moving: "&7* サーバー &b%server%&7 へ移動します。"
+    cannotMove: "&7* &c%server%&7 に移動できませんでした。"
 
 # サーバー移動時のメッセージ設定
 ServerSwitchMsg: "&7* &b%player%&7 が &b%server%&7 へ移動しました。"

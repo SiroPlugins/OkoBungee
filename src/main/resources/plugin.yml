@@ -1,9 +1,11 @@
 name: OkoBungee
 main: com.github.siroshun09.okobungee.OkoBungee
 version: ${project.version}
-api-version: "1.14"
+api-version: "1.15"
 description: ${project.description}
 author: Siroshun09
+depend:
+  - SiroLibrary
 commands:
   okobungee:
     aliases: [ob]

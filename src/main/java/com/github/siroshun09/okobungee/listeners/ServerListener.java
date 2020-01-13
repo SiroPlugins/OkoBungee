@@ -1,7 +1,7 @@
 package com.github.siroshun09.okobungee.listeners;
 
-import com.github.siroshun09.okobungee.OkoBungee;
-import com.github.siroshun09.okobungee.utils.MessageUtils;
+import com.github.siroshun09.okobungee.Configuration;
+import com.github.siroshun09.sirolibrary.message.BungeeMessage;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -18,35 +18,47 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServerListener implements Listener {
+    private static ServerListener instance;
     private final StringBuilder reasonBuilder = new StringBuilder();
     private final List<ProxiedPlayer> ignoreList = new ArrayList<>();
+
+    private ServerListener() {
+        instance = this;
+    }
+
+    public static ServerListener get() {
+        if (instance == null) {
+            new ServerListener();
+        }
+        return instance;
+    }
 
     @EventHandler
     public void onKick(@NotNull ServerKickEvent e) {
         ServerInfo from = e.getKickedFrom();
+        if (from == null) {
+            from = ProxyServer.getInstance().getReconnectHandler().getServer(e.getPlayer());
+        }
 
-        if (from == null) from = ProxyServer.getInstance().getReconnectHandler().getServer(e.getPlayer());
-
-        ServerInfo to = ProxyServer.getInstance().getServerInfo(
-                OkoBungee.getInstance().getConfig().getConfiguration().getString("BungeeKick.sendTo"));
-
-        if (to == null || to.equals(from)) return;
+        ServerInfo to = ProxyServer.getInstance().getServerInfo(Configuration.get().getSendToServerName());
+        if (to == null || to.equals(from)) {
+            return;
+        }
 
         e.setCancelled(true);
         e.setCancelServer(to);
 
         reasonBuilder.setLength(0);
-        for (BaseComponent c : e.getKickReasonComponent()) reasonBuilder.append(c.toLegacyText());
+        for (BaseComponent c : e.getKickReasonComponent()) {
+            reasonBuilder.append(c.toLegacyText());
+        }
 
-        MessageUtils.send(e.getPlayer(), OkoBungee.getInstance().getConfig().getConfiguration()
-                .getString("BungeeKick.message").replace("%from%", from.getName()).replace("%reason%", reasonBuilder.toString()));
+        BungeeMessage.sendMessageWithColor(e.getPlayer(), Configuration.get().getKickMsg(from, reasonBuilder));
     }
 
     @EventHandler
     public void onLogin(@NotNull PostLoginEvent e) {
-        MessageUtils.broadcast(OkoBungee.getInstance().getConfig().getConfiguration()
-                .getString("ServerConnectMsg", "&6* &r%player%&6 がおこ鯖にログインしました。")
-                .replace("%player%", e.getPlayer().getName()));
+        BungeeMessage.broadcastWithColor(Configuration.get().getServerConnectedMsg(e.getPlayer()));
         ignoreList.add(e.getPlayer());
     }
 
@@ -54,9 +66,7 @@ public class ServerListener implements Listener {
     public void onDisconnect(@NotNull ServerDisconnectEvent e) {
         if (e.getPlayer().getServer() == null) {
             ignoreList.remove(e.getPlayer());
-            MessageUtils.broadcast(OkoBungee.getInstance().getConfig().getConfiguration()
-                    .getString("ServerDisconnectMsg", "&7* &r%player%&7 がおこ鯖からログアウトしました。")
-                    .replace("%player%", e.getPlayer().getName()));
+            BungeeMessage.broadcastWithColor(Configuration.get().getServerDisconnectedMsg(e.getPlayer()));
         }
     }
 
@@ -66,9 +76,6 @@ public class ServerListener implements Listener {
             ignoreList.remove(e.getPlayer());
             return;
         }
-
-        MessageUtils.broadcast(OkoBungee.getInstance().getConfig().getConfiguration()
-                .getString("ServerSwitchMsg", "&7* &b%player%&7 が &b%server%&7 へ移動しました。")
-                .replace("%player%", e.getPlayer().getName()).replace("%server%", e.getPlayer().getServer().getInfo().getName()));
+        BungeeMessage.broadcastWithColor(Configuration.get().getServerSwitchMsg(e.getPlayer(), e.getPlayer().getServer().getInfo()));
     }
 }
